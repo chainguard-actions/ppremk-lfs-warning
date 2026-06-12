@@ -8,6 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| v3.2 | [`v3.2`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v3.2) | [`e5f9a4c`](https://github.com/ppremk/lfs-warning/commit/e5f9a4c21f4bee104db7c0f23954dde59e5df909) |
 | v3.3 | [`v3.3`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v3.3) | [`4b98a8a`](https://github.com/ppremk/lfs-warning/commit/4b98a8a5e6c429c23c34eee02d71553bca216425) |
 
 ## Privacy
