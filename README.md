@@ -1,15 +1,39 @@
-# ppremk/lfs-warning
+## LFS-Warning action
 
-Checks file sizes in a Pull Request and warns of large files
+This action scans files in commits of a Pull Request and compares it against the configured file size limit threshold. If the threshold is exceeded for any of the file, the action will mark the pull request as failed, add a `lfs-detected!` label and reply with an issue comment containing detected large file(s).
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/ppremk/lfs-warning](https://github.com/ppremk/lfs-warning).
+![pr-with-lfs-detected](https://user-images.githubusercontent.com/5770369/77542326-4cc7a400-6ea6-11ea-9d16-aa99be9b3240.png)
 
-## Versions
+Note: Remember to configure the branch protection rule and select the `LFS-warning` status when you enable the `Required status check to pass` option.
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v3.2 | [`v3.2`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v3.2) | [`e5f9a4c`](https://github.com/ppremk/lfs-warning/commit/e5f9a4c21f4bee104db7c0f23954dde59e5df909) |
-| v3.3 | [`v3.3`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v3.3) | [`4b98a8a`](https://github.com/ppremk/lfs-warning/commit/4b98a8a5e6c429c23c34eee02d71553bca216425) |
+![status-check](https://user-images.githubusercontent.com/5770369/77543439-fc514600-6ea7-11ea-8b33-ac9dedd98fd4.png)
+
+## Inputs
+
+#### `filesizelimit `
+
+Required, set's the file size limit threshold in bytes. Default "10MB".
+
+#### `token `
+
+Optional. Takes a valid **GitHub Token** from the Repo by default. 
+
+## Outputs
+
+#### `lfsFiles `
+
+Returns an array of possible detected large file(s)
+
+## Usage
+
+Consume the action by referencing the stable branch
+
+```yaml
+uses: actionsdesk/lfs-warning@v2.0
+with:
+  token: ${{ secrets.GITHUB_TOKEN }} # Optional
+  filesizelimit: '10485760' # 10 MB is 10485760 Bytes
+```
 
 ## Privacy
 
