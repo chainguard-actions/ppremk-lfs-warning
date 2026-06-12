@@ -1,16 +1,67 @@
-# ppremk/lfs-warning
+# LFS-Warning action
 
-Checks file sizes in a Pull Request and warns of large files
+This action works to prevent both:
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/ppremk/lfs-warning](https://github.com/ppremk/lfs-warning).
+- Large files that are not LFS tracked
+- Files that are LFS tracked
 
-## Versions
+from being checked-in in non-pointer format/not stored in LFS. The latter happens if the client does not have git-lfs installed.
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v2.0 | [`v2.0`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v2.0) | [`1a3a745`](https://github.com/ppremk/lfs-warning/commit/1a3a74543c2cf92cc97aa1bad190a500bcb3829c) |
-| v3.2 | [`v3.2`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v3.2) | [`e5f9a4c`](https://github.com/ppremk/lfs-warning/commit/e5f9a4c21f4bee104db7c0f23954dde59e5df909) |
-| v3.3 | [`v3.3`](https://github.com/chainguard-actions/ppremk-lfs-warning/tree/v3.3) | [`4b98a8a`](https://github.com/ppremk/lfs-warning/commit/4b98a8a5e6c429c23c34eee02d71553bca216425) |
+## How it works
+
+This action scans files in commits of a pull request and will mark the pull request as failed, add a `lfs-detected!` label and reply with an issue comment if any of the following is true about any of the pull request files:
+
+- The file size is greater than the configured file size limit threshold.
+- The file is tracked in LFS but is being checked-in as a regular file
+  - the current implementation of this check is that the file has git attribute `filter: lfs` but does not contain the string `version https://git-lfs.github.com/spec/v1'`
+
+![pr-with-lfs-detected](https://user-images.githubusercontent.com/5770369/77542326-4cc7a400-6ea6-11ea-9d16-aa99be9b3240.png)
+
+Note: Remember to configure the branch protection rule and select the `LFS-warning` status when you enable the `Required status check to pass` option.
+
+![status-check](https://user-images.githubusercontent.com/5770369/77543439-fc514600-6ea7-11ea-8b33-ac9dedd98fd4.png)
+
+## Inputs
+
+### `filesizelimit`
+
+Required, set's the file size limit threshold. Accepts `b` (bytes), `mb` (megabytes) and `gb` (gigabytes) as units of measurement, if omitted interprets as bytes.
+
+Default `10mb`.
+
+### `token`
+
+Optional. Takes a valid **GitHub Token** from the Repo by default.
+
+### `exclusionPatterns`
+
+Optional. A newline delimited list of glob patterns that match checked in files to exclude form LFS Warning.
+
+## Outputs
+
+### `lfsFiles`
+
+Returns an array of possible detected large file(s)
+
+## Usage
+
+Consume the action by referencing the stable release
+
+```yaml
+uses: actionsdesk/lfs-warning@v2.0
+with:
+  token: ${{ secrets.GITHUB_TOKEN }} # Optional
+  with:
+    filesizelimit: 10MB
+    exclusionPatterns: |
+      **/*.png
+```
+
+## Contributers
+
+- [@froi](https://github.com/froi)
+- [@decyjphr](https://github.com/decyjphr)
+- [@naseemkullah](https://github.com/naseemkullah)
 
 ## Privacy
 

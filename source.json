@@ -1,6 +1,11 @@
 {
   "owner": "ppremk",
   "repo": "lfs-warning",
-  "version": "",
-  "url": "https://github.com/ppremk/lfs-warning"
+  "version": "v3.0",
+  "commit_sha": "82ea90f6a6f6737f0b413cae92d31059334dcd0b",
+  "url": "https://github.com/ppremk/lfs-warning",
+  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
+  "test_agent_version": "1",
+  "harden_agent_version": "1"
 }
