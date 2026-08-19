@@ -1,4 +1,4 @@
-name: Test basic usage - default file size limit
+name: Test custom file size limit
 on:
   workflow_dispatch:
 jobs:
@@ -10,21 +10,19 @@ jobs:
         uses: .
         with:
           token: ${{ github.token }}
-          filesizelimit: "10mb"
+          filesizelimit: "5mb"
         continue-on-error: true
-      - name: Assert action completed
+      - name: Assert action ran with custom file size limit
         env:
           OUTCOME: ${{ steps.action.outcome }}
           LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
         run: |
           echo "outcome: $OUTCOME"
           echo "lfsFiles: $LFS_FILES"
-          # The action may succeed or fail depending on PR context availability.
-          # Under workflow_dispatch (not a PR), the action may exit with an error
-          # because there is no PR to inspect. We accept both success and failure
-          # as long as the step ran (outcome is not empty).
+          # The action may fail because there is no PR context under workflow_dispatch,
+          # but it should have run (outcome must be set).
           if [ -z "$OUTCOME" ]; then
             echo "FAIL: step outcome is empty — action did not run"
             exit 1
           fi
-          echo "PASS: action ran with outcome=$OUTCOME"
+          echo "PASS: action ran with custom filesizelimit, outcome=$OUTCOME"

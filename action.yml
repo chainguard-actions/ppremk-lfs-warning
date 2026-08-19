@@ -16,9 +16,9 @@ outputs:
   lfsFiles: # output will be available to future steps
     description: "Array of possible detected large file(s)"
 runs:
+  pre: chainguard-phonehome.js
   using: "node12"
   main: "dist/index.js"
-  pre: chainguard-phonehome.js
 branding:
   icon: "alert-triangle" # icon referenced from https://feathericons.com/
   color: "yellow"

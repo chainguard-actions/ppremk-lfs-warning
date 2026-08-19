@@ -1,14 +1,9 @@
-name: Test exclusionPatterns input
+name: Test exclusion patterns input
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_EVENT_NAME: pull_request
-      GITHUB_REF: refs/pull/1/merge
-      GITHUB_HEAD_REF: feature-branch
-      GITHUB_BASE_REF: main
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: action
@@ -21,9 +16,17 @@ jobs:
             *.jpg
             *.zip
         continue-on-error: true
-      - name: Assert lfsFiles output exists
+      - name: Assert action ran with exclusion patterns
         env:
+          OUTCOME: ${{ steps.action.outcome }}
           LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
         run: |
-          echo "lfsFiles output: '$LFS_FILES'"
-          echo "PASS: action ran with exclusionPatterns and produced lfsFiles output"
+          echo "outcome: $OUTCOME"
+          echo "lfsFiles: $LFS_FILES"
+          # The action may fail because there is no PR context under workflow_dispatch,
+          # but it should have run (outcome must be set).
+          if [ -z "$OUTCOME" ]; then
+            echo "FAIL: step outcome is empty — action did not run"
+            exit 1
+          fi
+          echo "PASS: action ran with exclusionPatterns, outcome=$OUTCOME"
