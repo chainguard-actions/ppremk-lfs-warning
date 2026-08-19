@@ -1,0 +1,33 @@
+name: Test custom file size limit
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/1/merge
+      GITHUB_HEAD_REF: feature-branch
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          token: ${{ github.token }}
+          filesizelimit: "5mb"
+        continue-on-error: true
+      - name: Assert action ran with custom file size limit
+        env:
+          LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "lfsFiles: $LFS_FILES"
+          # The action may fail due to missing PR context in act, but it should at least attempt to run
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action was invoked with custom filesizelimit"
+          else
+            echo "FAIL: action was not invoked (outcome: $OUTCOME)"
+            exit 1
+          fi

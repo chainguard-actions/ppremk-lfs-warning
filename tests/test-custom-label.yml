@@ -1,4 +1,4 @@
-name: Test basic usage (non-PR context)
+name: Test custom label name and color
 on:
   workflow_dispatch:
 jobs:
@@ -12,18 +12,20 @@ jobs:
         continue-on-error: true
         with:
           token: ${{ github.token }}
+          labelName: "large-file-warning"
+          labelColor: "ff0000"
 
-      - name: Assert lfsFiles output is empty in non-PR context
+      - name: Assert action completed with custom label settings
         env:
           LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "step outcome: '$OUTCOME'"
           echo "lfsFiles output: '$LFS_FILES'"
-          # In a non-PR context the action skips the LFS file check,
-          # so lfsFiles should never be set (it is only set when large files are detected in a PR)
+          # In a non-PR context the action skips the LFS file check.
+          # lfsFiles is only set when large files are detected in a PR, so it should be empty here.
           if [ -n "$LFS_FILES" ]; then
             echo "FAIL: expected lfsFiles to be empty in non-PR context, got: $LFS_FILES"
             exit 1
           fi
-          echo "PASS: lfsFiles is empty as expected in non-PR context (outcome=$OUTCOME)"
+          echo "PASS: action ran with custom labelName/labelColor and lfsFiles is empty (outcome=$OUTCOME)"

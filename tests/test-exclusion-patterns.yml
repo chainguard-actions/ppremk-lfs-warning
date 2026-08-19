@@ -1,32 +1,36 @@
-name: Test exclusionPatterns input
+name: Test exclusion patterns input
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_EVENT_NAME: pull_request
-      GITHUB_REF: refs/pull/1/merge
-      GITHUB_HEAD_REF: feature-branch
-      GITHUB_BASE_REF: main
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
       - id: action
         uses: .
+        continue-on-error: true
         with:
           token: ${{ github.token }}
-          filesizelimit: "5mb"
+          filesizelimit: "10mb"
           exclusionPatterns: |
-            *.png
-            *.jpg
-            *.zip
-          labelName: lfs-detected!
-          labelColor: ff1493
-        continue-on-error: true
-      - name: Assert action ran with exclusionPatterns
+            **/*.png
+            **/*.jpg
+            **/*.gif
+            docs/**
+
+      - name: Assert action completed with exclusion patterns
         env:
           LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
+          OUTCOME: ${{ steps.action.outcome }}
         run: |
+          echo "step outcome: '$OUTCOME'"
           echo "lfsFiles output: '$LFS_FILES'"
-          # The action may fail due to no real PR context, but we verify it ran
-          echo "PASS: action executed with exclusionPatterns"
+          # In a non-PR context the action skips the LFS file check entirely.
+          # Exclusion patterns are only applied when processing PR files.
+          # lfsFiles is only set when large files are detected in a PR, so it should be empty here.
+          if [ -n "$LFS_FILES" ]; then
+            echo "FAIL: expected lfsFiles to be empty in non-PR context, got: $LFS_FILES"
+            exit 1
+          fi
+          echo "PASS: action ran with exclusionPatterns and lfsFiles is empty (outcome=$OUTCOME)"
