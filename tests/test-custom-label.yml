@@ -1,4 +1,4 @@
-name: Test exclusionPatterns input
+name: Test custom label inputs
 on:
   workflow_dispatch:
 jobs:
@@ -12,22 +12,20 @@ jobs:
         continue-on-error: true
         with:
           token: ${{ github.token }}
+          labelName: "large-file-warning"
+          labelColor: "ff6600"
           filesizelimit: "10mb"
-          exclusionPatterns: |
-            **/*.pdf
-            **/*.zip
-            assets/**
 
-      - name: Assert action ran with exclusion patterns (non-PR context)
+      - name: Assert action ran with custom label config (non-PR context)
         env:
           OUTCOME: ${{ steps.action.outcome }}
           LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
         run: |
           echo "Action outcome: $OUTCOME"
           echo "lfsFiles output: '$LFS_FILES'"
-          # In non-PR context, lfsFiles should not be set regardless of exclusion patterns
+          # In non-PR context, lfsFiles should not be set regardless of label config
           if [ -n "$LFS_FILES" ]; then
             echo "FAIL: expected lfsFiles to be empty in non-PR context, got: $LFS_FILES"
             exit 1
           fi
-          echo "PASS: lfsFiles is empty as expected with exclusion patterns in non-PR context"
+          echo "PASS: lfsFiles is empty as expected with custom label config"

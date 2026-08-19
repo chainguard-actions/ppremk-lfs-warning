@@ -1,4 +1,4 @@
-name: Test exclusionPatterns input
+name: Test basic non-PR usage
 on:
   workflow_dispatch:
 jobs:
@@ -13,21 +13,18 @@ jobs:
         with:
           token: ${{ github.token }}
           filesizelimit: "10mb"
-          exclusionPatterns: |
-            **/*.pdf
-            **/*.zip
-            assets/**
 
-      - name: Assert action ran with exclusion patterns (non-PR context)
+      - name: Assert action ran (non-PR context)
         env:
           OUTCOME: ${{ steps.action.outcome }}
           LFS_FILES: ${{ steps.action.outputs.lfsFiles }}
         run: |
           echo "Action outcome: $OUTCOME"
           echo "lfsFiles output: '$LFS_FILES'"
-          # In non-PR context, lfsFiles should not be set regardless of exclusion patterns
+          # In non-PR context, the action should not set lfsFiles output
+          # (lfsFiles is only set when large files are detected in a PR)
           if [ -n "$LFS_FILES" ]; then
             echo "FAIL: expected lfsFiles to be empty in non-PR context, got: $LFS_FILES"
             exit 1
           fi
-          echo "PASS: lfsFiles is empty as expected with exclusion patterns in non-PR context"
+          echo "PASS: lfsFiles is empty as expected in non-PR context"

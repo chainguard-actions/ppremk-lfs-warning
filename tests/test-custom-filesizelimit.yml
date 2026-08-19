@@ -1,0 +1,48 @@
+name: Test custom filesizelimit input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Test with filesizelimit in bytes
+        id: action-bytes
+        uses: .
+        continue-on-error: true
+        with:
+          token: ${{ github.token }}
+          filesizelimit: "5242880"
+
+      - name: Test with filesizelimit in mb
+        id: action-mb
+        uses: .
+        continue-on-error: true
+        with:
+          token: ${{ github.token }}
+          filesizelimit: "5mb"
+
+      - name: Test with filesizelimit in gb
+        id: action-gb
+        uses: .
+        continue-on-error: true
+        with:
+          token: ${{ github.token }}
+          filesizelimit: "1gb"
+
+      - name: Assert no lfsFiles output for any run (non-PR context)
+        env:
+          LFS_FILES_BYTES: ${{ steps.action-bytes.outputs.lfsFiles }}
+          LFS_FILES_MB: ${{ steps.action-mb.outputs.lfsFiles }}
+          LFS_FILES_GB: ${{ steps.action-gb.outputs.lfsFiles }}
+        run: |
+          echo "lfsFiles (bytes): '$LFS_FILES_BYTES'"
+          echo "lfsFiles (mb): '$LFS_FILES_MB'"
+          echo "lfsFiles (gb): '$LFS_FILES_GB'"
+          # In non-PR context, lfsFiles should never be set regardless of filesizelimit
+          if [ -n "$LFS_FILES_BYTES" ] || [ -n "$LFS_FILES_MB" ] || [ -n "$LFS_FILES_GB" ]; then
+            echo "FAIL: expected all lfsFiles outputs to be empty in non-PR context"
+            exit 1
+          fi
+          echo "PASS: all lfsFiles outputs are empty as expected in non-PR context"
