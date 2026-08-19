@@ -1,0 +1,27 @@
+name: LFS-warning
+
+on:
+  pull_request:
+    types: [assigned, opened, edited, reopened, synchronize, ready_for_review]
+  issue_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  lfs-warning:
+
+    name: LFS Warning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Repo Code
+        id: get_repo_code
+        uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+
+      - name: LFS Warning
+        id: lfs_warning
+        uses: ./
+        with:
+          filesizelimit: 10485760 # 10MB
